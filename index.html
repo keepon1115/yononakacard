@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>多様性を照らすカードゲーム</title>
+   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+   <style>
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+       }
+       body {
+           font-family: 'Noto Sans JP', sans-serif;
+           background: #f0f4f8;
+           color: #333;
+           min-height: 100vh;
+           display: flex;
+       }
+       .main-container {
+           flex: 1;
+           padding: 20px;
+           max-width: 800px;
+           margin: 0 auto;
+       }
+       .sidebar {
+           width: 300px;
+           background: #fff;
+           padding: 20px;
+           box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+       }
+       .game-title {
+           text-align: center;
+           font-size: 24px;
+           font-weight: 700;
+           margin-bottom: 30px;
+       }
+       .setup-section {
+           background: #fff;
+           padding: 30px;
+           border-radius: 10px;
+           box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+           margin-bottom: 20px;
+       }
+       .player-input {
+           margin: 10px 0;
+       }
+       .player-input input {
+           width: 100%;
+           padding: 8px;
+           border: 1px solid #ddd;
+           border-radius: 5px;
+           font-size: 16px;
+       }
+       .btn {
+           background: #4CAF50;
+           color: white;
+           border: none;
+           padding: 10px 20px;
+           border-radius: 5px;
+           cursor: pointer;
+           font-size: 16px;
+           margin: 10px 5px;
+       }
+       .btn:hover {
+           background: #45a049;
+       }
+       .btn-secondary {
+           background: #2196F3;
+       }
+       .btn-secondary:hover {
+           background: #1976D2;
+       }
+       .game-area {
+           display: none;
+       }
+       .topic-card {
+           background: #fff;
+           padding: 20px;
+           border-radius: 10px;
+           text-align: center;
+           font-size: 20px;
+           margin: 20px 0;
+           box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+       }
+       .player-area {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+           gap: 15px;
+           margin: 20px 0;
+       }
+       .player-card {
+           background: #fff;
+           padding: 15px;
+           border-radius: 10px;
+           box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+       }
+       .player-card h3 {
+           margin-bottom: 10px;
+           color: #333;
+       }
+       .timer-container {
+           position: relative;
+           width: 120px;
+           height: 120px;
+           margin: 20px auto;
+       }
+       .timer-circle {
+           transform: rotate(-90deg);
+       }
+       .timer-text {
+           position: absolute;
+           top: 50%;
+           left: 50%;
+           transform: translate(-50%, -50%);
+           font-size: 24px;
+           font-weight: 700;
+       }
+       .modal {
+           display: none;
+           position: fixed;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           background: rgba(0,0,0,0.5);
+           z-index: 1000;
+       }
+       .modal-content {
+           position: absolute;
+           top: 50%;
+           left: 50%;
+           transform: translate(-50%, -50%);
+           background: #fff;
+           padding: 30px;
+           border-radius: 10px;
+           width: 90%;
+           max-width: 500px;
+       }
+       .score-board {
+           background: #f8f9fa;
+           padding: 15px;
+           border-radius: 10px;
+           margin-bottom: 20px;
+       }
+       .score-item {
+           display: flex;
+           justify-content: space-between;
+           padding: 8px 0;
+           border-bottom: 1px solid #ddd;
+       }
+       .audio-control {
+           position: fixed;
+           bottom: 20px;
+           right: 20px;
+           z-index: 100;
+       }
+       .hidden {
+           display: none;
+       }
+       @media (max-width: 768px) {
+           body {
+               flex-direction: column;
+           }
+           .sidebar {
+               width: 100%;
+               order: 2;
+           }
+           .main-container {
+               order: 1;
+           }
+       }
+   </style>
+</head>
+<body>
+   <div class="main-container">
+       <h1 class="game-title">多様性を照らすカードゲーム</h1>
+       
+       <div class="setup-section" id="setup">
+           <h2>ゲーム設定</h2>
+           <div id="playerInputs">
+               <div class="player-input">
+                   <input type="text" placeholder="プレイヤー1の名前" id="player1">
+               </div>
+               <div class="player-input">
+                   <input type="text" placeholder="プレイヤー2の名前" id="player2">
+               </div>
+               <div class="player-input">
+                   <input type="text" placeholder="プレイヤー3の名前" id="player3">
+               </div>
+               <div class="player-input">
+                   <input type="text" placeholder="プレイヤー4の名前" id="player4">
+               </div>
+           </div>
+           <div>
+               <label>
+                   <input type="radio" name="timerMode" value="120" checked> 通常モード（2分）
+               </label>
+               <label>
+                   <input type="radio" name="timerMode" value="60"> 早押しモード（1分）
+               </label>
+           </div>
+           <button class="btn" onclick="startGame()">ゲーム開始</button>
+       </div>
+
+       <div class="game-area" id="gameArea">
+           <div class="topic-card" id="topicCard">
+               <button class="btn" onclick="drawTopic()">お題を引く</button>
+           </div>
+           
+           <div class="timer-container hidden" id="timerContainer">
+               <svg width="120" height="120" class="timer-circle">
+                   <circle cx="60" cy="60" r="50" stroke="#ddd" stroke-width="10" fill="none"/>
+                   <circle id="timerCircle" cx="60" cy="60" r="50" stroke="#4CAF50" stroke-width="10" fill="none"
+                       stroke-dasharray="314" stroke-dashoffset="0"/>
+               </svg>
+               <div class="timer-text" id="timerText">0:00</div>
+           </div>
+           
+           <div class="player-area" id="playerArea"></div>
+           
+           <div class="hidden" id="presentationArea">
+               <button class="btn" onclick="startPresentation()">発表開始</button>
+           </div>
+       </div>
+   </div>
+
+   <div class="sidebar">
+       <h2>スコアボード</h2>
+       <div class="score-board" id="scoreBoard"></div>
+       <div id="reactionHistory"></div>
+   </div>
+
+   <div class="modal" id="modal">
+       <div class="modal-content" id="modalContent"></div>
+   </div>
+
+   <div class="audio-control">
+       <button class="btn btn-secondary" onclick="toggleBGM()">BGM ON/OFF</button>
+   </div>
+
+   <audio id="bgm" loop>
+       <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+   </audio>
+
+   <script>
+       const triggerCards = [
+           "この世にまだない〇〇は？",
+           "だらしない〇〇は？",
+           "今社会に必要な〇〇は？",
+           "ありそうでない〇〇は？",
+           "明日の〇〇は？",
+           "戦国時代の〇〇は？",
+           "100年後の〇〇は？",
+           "友達になりたくない〇〇は？",
+           "思わず〇〇してしまうことは？",
+           "ちょっと怖い〇〇は？",
+           "みんなが気づいていない〇〇は？",
+           "夢でも見ない〇〇は？",
+           "今の時代だからこその〇〇は？",
+           "無人島だからこその〇〇は？"
+       ];
+
+       const wordCards = [
+           "感情","季節","食べ物","乗り物",
+           "服","遊び","場所","人物",
+           "色","動物","道具","音楽"
+       ];
+
+       const reactionCards = [
+           {text:"ユニーク！",point:3},
+           {text:"実用的！",point:2},
+           {text:"びっくり！",point:3},
+           {text:"感動的！",point:3},
+           {text:"わかりやすいね",point:2},
+           {text:"おもしろい！",point:3},
+           {text:"あたらしい！",point:3},
+           {text:"活気があるね",point:2},
+           {text:"挑戦的！",point:3},
+           {text:"やまとなでしこだね",point:2},
+           {text:"おしゃれだね",point:2},
+           {text:"温故知新だね",point:2},
+           {text:"低姿勢だね",point:1},
+           {text:"せやね",point:1},
+           {text:"しみるね",point:2},
+           {text:"うまれたね",point:2},
+           {text:"なるほど",point:1},
+           {text:"それそれ",point:1},
+           {text:"やられた！",point:3},
+           {text:"うひょー！",point:3}
+       ];
+
+       let gameState = {
+           players: [],
+           currentTopic: '',
+           currentTrigger: '',
+           currentPlayer: 0,
+           answers: {},
+           scores: {},
+           timerMode: 120,
+           timerInterval: null,
+           presentationOrder: [],
+           presentationIndex: 0,
+           doublePointFlags: {}
+       };
+
+       function shuffle(array) {
+           const arr = [...array];
+           for (let i = arr.length - 1; i > 0; i--) {
+               const j = Math.floor(Math.random() * (i + 1));
+               [arr[i], arr[j]] = [arr[j], arr[i]];
+           }
+           return arr;
+       }
+
+       function startGame() {
+           const players = [];
+           for (let i = 1; i <= 4; i++) {
+               const name = document.getElementById(`player${i}`).value;
+               if (name) players.push(name);
+           }
+           
+           if (players.length < 2) {
+               alert('最低2人のプレイヤーが必要です');
+               return;
+           }
+           
+           gameState.players = players;
+           gameState.timerMode = parseInt(document.querySelector('input[name="timerMode"]:checked').value);
+           players.forEach(p => {
+               gameState.scores[p] = 0;
+               gameState.answers[p] = '';
+               gameState.doublePointFlags[p] = false;
+           });
+           
+           document.getElementById('setup').style.display = 'none';
+           document.getElementById('gameArea').style.display = 'block';
+           updateScoreBoard();
+           
+           const bgm = document.getElementById('bgm');
+           bgm.volume = 0.3;
+           bgm.play().catch(e => console.log('BGM autoplay blocked'));
+       }
+
+       function drawTopic() {
+           const trigger = shuffle(triggerCards)[0];
+           gameState.currentTrigger = trigger;
+           
+           const modalContent = `
+               <h2>${trigger}</h2>
+               <p>〇〇の部分を決めてください</p>
+               <button class="btn" onclick="selectWordMethod('self')">自分で入力（得点2倍）</button>
+               <button class="btn btn-secondary" onclick="selectWordMethod('card')">ワードカードから選ぶ</button>
+           `;
+           showModal(modalContent);
+       }
+
+       function selectWordMethod(method) {
+           const player = gameState.players[gameState.currentPlayer];
+           
+           if (method === 'self') {
+               const modalContent = `
+                   <h2>〇〇を入力してください</h2>
+                   <input type="text" id="customWord" style="width:100%; padding:10px; margin:10px 0;">
+                   <button class="btn" onclick="setTopic(document.getElementById('customWord').value, true)">決定</button>
+               `;
+               showModal(modalContent);
+           } else {
+               const word = shuffle(wordCards)[0];
+               setTopic(word, false);
+           }
+       }
+
+       function setTopic(word, isDouble) {
+           if (!word) return;
+           
+           const player = gameState.players[gameState.currentPlayer];
+           gameState.doublePointFlags[player] = isDouble;
+           gameState.currentTopic = gameState.currentTrigger.replace('〇〇', word);
+           
+           document.getElementById('topicCard').innerHTML = `
+               <h2>${gameState.currentTopic}</h2>
+               <p>${isDouble ? '（自力入力：得点2倍）' : ''}</p>
+           `;
+           
+           hideModal();
+           startTimer();
+           createPlayerInputs();
+       }
+
+       function createPlayerInputs() {
+           const playerArea = document.getElementById('playerArea');
+           playerArea.innerHTML = '';
+           
+           gameState.players.forEach(player => {
+               const div = document.createElement('div');
+               div.className = 'player-card';
+               div.innerHTML = `
+                   <h3>${player}</h3>
+                   <input type="text" id="answer-${player}" placeholder="回答を入力">
+                   <button class="btn" onclick="submitAnswer('${player}')">送信</button>
+                   <div id="submitted-${player}"></div>
+               `;
+               playerArea.appendChild(div);
+           });
+       }
+
+       function submitAnswer(player) {
+           const input = document.getElementById(`answer-${player}`);
+           const answer = input.value;
+           if (!answer) return;
+           
+           gameState.answers[player] = answer;
+           document.getElementById(`submitted-${player}`).innerHTML = `<p>✓ 送信済み</p>`;
+           input.disabled = true;
+           
+           if (Object.keys(gameState.answers).length === gameState.players.length) {
+               clearInterval(gameState.timerInterval);
+               document.getElementById('presentationArea').classList.remove('hidden');
+           }
+       }
+
+       function startTimer() {
+           let timeLeft = gameState.timerMode;
+           const timerContainer = document.getElementById('timerContainer');
+           timerContainer.classList.remove('hidden');
+           
+           gameState.timerInterval = setInterval(() => {
+               const minutes = Math.floor(timeLeft / 60);
+               const seconds = timeLeft % 60;
+               document.getElementById('timerText').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+               
+               const offset = 314 - (314 * timeLeft / gameState.timerMode);
+               document.getElementById('timerCircle').style.strokeDashoffset = offset;
+               
+               timeLeft--;
+               if (timeLeft < 0) {
+                   clearInterval(gameState.timerInterval);
+                   document.getElementById('presentationArea').classList.remove('hidden');
+               }
+           }, 1000);
+       }
+
+       function startPresentation() {
+           const answeredPlayers = Object.keys(gameState.answers).filter(p => gameState.answers[p]);
+           gameState.presentationOrder = shuffle(answeredPlayers);
+           gameState.presentationIndex = 0;
+           showNextPresentation();
+       }
+
+       function showNextPresentation() {
+           if (gameState.presentationIndex >= gameState.presentationOrder.length) {
+               finishRound();
+               return;
+           }
+           
+           const player = gameState.presentationOrder[gameState.presentationIndex];
+           const answer = gameState.answers[player];
+           
+           const modalContent = `
+               <h2>${player}の回答</h2>
+               <h3>${answer}</h3>
+               <p>30秒で説明してください</p>
+               <div id="reactionArea">
+                   <h4>他のプレイヤーはリアクションを選んでください</h4>
+                   ${gameState.players.filter(p => p !== player).map(p => `
+                       <div style="margin:10px 0;">
+                           <label>${p}:</label>
+                           <select id="reaction-${p}">
+                               <option value="">選択してください</option>
+                               ${reactionCards.map((r, i) => `<option value="${i}">${r.text} (${r.point}点)</option>`).join('')}
+                           </select>
+                       </div>
+                   `).join('')}
+               </div>
+               <button class="btn" onclick="submitReactions('${player}')">次へ</button>
+           `;
+           showModal(modalContent);
+       }
+
+       function submitReactions(targetPlayer) {
+           gameState.players.filter(p => p !== targetPlayer).forEach(player => {
+               const select = document.getElementById(`reaction-${player}`);
+               if (select && select.value) {
+                   const reaction = reactionCards[parseInt(select.value)];
+                   let points = reaction.point;
+                   if (gameState.doublePointFlags[targetPlayer]) {
+                       points *= 2;
+                   }
+                   gameState.scores[targetPlayer] = (gameState.scores[targetPlayer] || 0) + points;
+               }
+           });
+           
+           updateScoreBoard();
+           gameState.presentationIndex++;
+           showNextPresentation();
+       }
+
+       function finishRound() {
+           hideModal();
+           gameState.currentPlayer = (gameState.currentPlayer + 1) % gameState.players.length;
+           gameState.answers = {};
+           gameState.doublePointFlags = {};
+           
+           document.getElementById('topicCard').innerHTML = '<button class="btn" onclick="drawTopic()">お題を引く</button>';
+           document.getElementById('playerArea').innerHTML = '';
+           document.getElementById('timerContainer').classList.add('hidden');
+           document.getElementById('presentationArea').classList.add('hidden');
+       }
+
+       function updateScoreBoard() {
+           const scoreBoard = document.getElementById('scoreBoard');
+           scoreBoard.innerHTML = Object.entries(gameState.scores)
+               .sort((a, b) => b[1] - a[1])
+               .map(([player, score]) => `
+                   <div class="score-item">
+                       <span>${player}</span>
+                       <span>${score}点</span>
+                   </div>
+               `).join('');
+       }
+
+       function showModal(content) {
+           document.getElementById('modalContent').innerHTML = content;
+           document.getElementById('modal').style.display = 'block';
+       }
+
+       function hideModal() {
+           document.getElementById('modal').style.display = 'none';
+       }
+
+       function toggleBGM() {
+           const bgm = document.getElementById('bgm');
+           if (bgm.paused) {
+               bgm.play();
+           } else {
+               bgm.pause();
+           }
+       }
+
+       /* TODO: 拡張案
+        * - WebSocket実装: Socket.IOでリアルタイム同期
+        * - DB保存: IndexedDBでゲーム履歴保存
+        * - オンライン対戦: Firebaseでルーム機能追加
+        * - カスタムカード: ユーザー作成カードの追加機能
+        * - 統計機能: 人気回答の分析・表示
+        */
+   </script>
+</body>
+</html>
