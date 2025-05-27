@@ -99,6 +99,7 @@
             padding: 20px;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             display: none;
+            z-index: 100;
         }
         .reaction-cards {
             display: flex;
@@ -114,9 +115,17 @@
             border: 2px solid transparent;
             min-width: 120px;
             text-align: center;
+            white-space: nowrap;
+            transition: all 0.3s;
         }
         .reaction-card:hover {
             border-color: #4CAF50;
+            transform: translateY(-2px);
+        }
+        .reaction-card.used {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #e0e0e0;
         }
         .timer-container {
             text-align: center;
@@ -133,17 +142,18 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
         .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             background: #fff;
             padding: 30px;
             border-radius: 10px;
             width: 90%;
             max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .score-board {
             background: #f8f9fa;
@@ -157,6 +167,9 @@
             padding: 8px 0;
             border-bottom: 1px solid #ddd;
         }
+        .score-item:last-child {
+            border-bottom: none;
+        }
         .toast {
             position: fixed;
             top: 20px;
@@ -166,20 +179,200 @@
             padding: 15px 20px;
             border-radius: 5px;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transform: translateY(-20px);
             z-index: 2000;
+            max-width: 300px;
         }
         .toast.show {
             opacity: 1;
+            transform: translateY(0);
+        }
+        .toast.reaction-received {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-size: 18px;
+            padding: 20px 25px;
         }
         .hidden {
-            display: none;
+            display: none !important;
         }
         .answer-display {
             background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .like-button-container {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .like-button {
+            background: #FF69B4;
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .like-button:hover {
+            background: #FF1493;
+            transform: scale(1.1);
+        }
+        .like-button:active {
+            transform: scale(0.95);
+        }
+        .heart-animation {
+            position: fixed;
+            font-size: 30px;
+            color: #FF69B4;
+            animation: floatUp 1.5s ease-out forwards;
+            pointer-events: none;
+            z-index: 2001;
+        }
+        @keyframes floatUp {
+            0% { 
+                transform: translateY(0) scale(1) rotate(0deg); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(-100px) scale(1.5) rotate(15deg); 
+                opacity: 0; 
+            }
+        }
+        .roulette-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .roulette-wheel {
+            width: 300px;
+            height: 80px;
+            border: 3px solid #4CAF50;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            background: #fff;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .roulette-strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            transition: transform 3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .roulette-item {
+            width: 300px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-right: 1px solid #ddd;
+        }
+        .roulette-pointer {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid #4CAF50;
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .catch-ball-chat-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+        .chat-message {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .chat-message strong {
+            color: #007bff;
+        }
+        .chat-input-area {
+            display: flex;
+            margin-top: 10px;
+        }
+        .chat-input-area input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .round-info {
+            background: #007bff;
+            color: white;
             padding: 10px;
             border-radius: 5px;
-            margin: 10px 0;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .final-results {
+            padding: 20px;
+        }
+        .winner-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .winner-section h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .winner-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .score-details {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .score-details h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .detail-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #fff;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        .reaction-message-highlight {
+            color: #ff69b4;
+            font-weight: 700;
+            font-size: 20px;
         }
         @media (max-width: 768px) {
             body {
@@ -193,6 +386,22 @@
                 order: 1;
                 padding-bottom: 150px;
             }
+            .hand-area {
+                padding: 10px;
+            }
+            .reaction-card {
+                min-width: 100px;
+                font-size: 14px;
+            }
+            .like-button-container {
+                bottom: 120px;
+            }
+            .roulette-wheel {
+                width: 250px;
+            }
+            .roulette-item {
+                width: 250px;
+            }
         }
     </style>
 </head>
@@ -203,7 +412,7 @@
         <div class="room-section" id="roomSection">
             <h2>ルーム設定</h2>
             <input type="text" id="playerName" class="input-field" placeholder="あなたの名前">
-            <input type="text" id="roomCode" class="input-field" placeholder="ルームコード（4文字）">
+            <input type="text" id="roomCode" class="input-field" placeholder="ルームコード（4文字）" maxlength="4">
             <div>
                 <button class="btn" onclick="createRoom()">ルーム作成</button>
                 <button class="btn btn-secondary" onclick="joinRoom()">ルーム参加</button>
@@ -211,6 +420,8 @@
         </div>
 
         <div class="game-area hidden" id="gameArea">
+            <div class="round-info" id="roundInfo">ラウンド 1 / 3</div>
+            
             <div class="topic-card" id="topicCard">
                 <p id="topicText">ホストがお題を引くのを待っています...</p>
                 <button class="btn hidden" id="drawTopicBtn" onclick="drawTopic()">お題を引く</button>
@@ -226,8 +437,19 @@
             </div>
 
             <div class="hidden" id="presentationArea">
-                <button class="btn hidden" id="startPresentBtn" onclick="startPresentation()">発表開始</button>
+                <button class="btn hidden" id="startPresentBtn" onclick="startPresentation()">発表スタート！</button>
                 <div id="presentationContent"></div>
+                
+                <div id="catchBallTimeContainer" class="hidden">
+                    <h3>キャッチボールタイム</h3>
+                    <div id="catchBallTimer" style="font-size:24px; text-align:center; margin:10px 0;">2:00</div>
+                    <div class="catch-ball-chat-container" id="chatMessages"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" class="input-field" placeholder="メッセージを入力..." onkeypress="handleChatKeyPress(event)">
+                        <button class="btn btn-secondary" onclick="sendChatMessage()">送信</button>
+                    </div>
+                    <button class="btn" id="skipCatchBallBtn" onclick="skipCatchBall()">キャッチボールタイムを終了</button>
+                </div>
             </div>
         </div>
     </div>
@@ -249,8 +471,12 @@
 
     <div class="toast" id="toast"></div>
 
+    <div class="like-button-container hidden" id="likeButtonContainer">
+        <button class="like-button" onclick="triggerHeartAnimation(event)">❤️</button>
+    </div>
+
     <script type="module">
-        // Firebase設定（環境に応じて変更してください）
+        // Firebase設定
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_ID.firebaseapp.com",
@@ -262,55 +488,28 @@
         };
 
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, onValue, push, remove, onDisconnect, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, set, get, onValue, push, remove, onDisconnect, serverTimestamp, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
         const triggerCards = [
-            "この世にまだない〇〇は？",
-            "だらしない〇〇は？",
-            "今社会に必要な〇〇は？",
-            "ありそうでない〇〇は？",
-            "明日の〇〇は？",
-            "戦国時代の〇〇は？",
-            "100年後の〇〇は？",
-            "友達になりたくない〇〇は？",
-            "思わず〇〇してしまうことは？",
-            "ちょっと怖い〇〇は？",
-            "みんなが気づいていない〇〇は？",
-            "夢でも見ない〇〇は？",
-            "今の時代だからこその〇〇は？",
-            "無人島だからこその〇〇は？"
+            "この世にまだない〇〇は？", "だらしない〇〇は？", "今社会に必要な〇〇は？", "ありそうでない〇〇は？",
+            "明日の〇〇は？", "戦国時代の〇〇は？", "100年後の〇〇は？", "友達になりたくない〇〇は？",
+            "思わず〇〇してしまうことは？", "ちょっと怖い〇〇は？", "みんなが気づいていない〇〇は？",
+            "夢でも見ない〇〇は？", "今の時代だからこその〇〇は？", "無人島だからこその〇〇は？"
         ];
 
         const wordCards = [
-            "感情","季節","食べ物","乗り物",
-            "服","遊び","場所","人物",
+            "感情","季節","食べ物","乗り物", "服","遊び","場所","人物",
             "色","動物","道具","音楽"
         ];
 
-        const reactionCards = [
-            {text:"ユニーク！",point:3},
-            {text:"実用的！",point:2},
-            {text:"びっくり！",point:3},
-            {text:"感動的！",point:3},
-            {text:"わかりやすいね",point:2},
-            {text:"おもしろい！",point:3},
-            {text:"あたらしい！",point:3},
-            {text:"活気があるね",point:2},
-            {text:"挑戦的！",point:3},
-            {text:"やまとなでしこだね",point:2},
-            {text:"おしゃれだね",point:2},
-            {text:"温故知新だね",point:2},
-            {text:"低姿勢だね",point:1},
-            {text:"せやね",point:1},
-            {text:"しみるね",point:2},
-            {text:"うまれたね",point:2},
-            {text:"なるほど",point:1},
-            {text:"それそれ",point:1},
-            {text:"やられた！",point:3},
-            {text:"うひょー！",point:3}
+        const baseReactionCardTexts = [
+            "ユニーク！", "実用的！", "びっくり！", "感動的！", "わかりやすいね",
+            "おもしろい！", "あたらしい！", "活気があるね", "挑戦的！", "やまとなでしこだね",
+            "おしゃれだね", "温故知新だね", "低姿勢だね", "せやね", "しみるね",
+            "うまれたね", "なるほど", "それそれ", "やられた！", "うひょー！"
         ];
 
         let localState = {
@@ -318,8 +517,14 @@
             playerName: '',
             roomCode: '',
             isHost: false,
-            currentRoom: null,
-            timerInterval: null
+            currentRoomRef: null,
+            timerInterval: null,
+            catchBallTimerInterval: null,
+            currentRound: 1,
+            maxRounds: 3,
+            usedReactionCardIndexes: [],
+            listeners: [],
+            rouletteInterval: null
         };
 
         function shuffle(array) {
@@ -339,11 +544,16 @@
             return Math.random().toString(36).substr(2, 4).toUpperCase();
         }
 
-        function showToast(message) {
+        function showToast(message, isReaction = false) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            if (isReaction) {
+                toast.classList.add('reaction-received');
+            }
+            setTimeout(() => {
+                toast.classList.remove('show', 'reaction-received');
+            }, isReaction ? 4000 : 3000);
         }
 
         window.createRoom = async function() {
@@ -358,21 +568,27 @@
             localState.roomCode = generateRoomCode();
             localState.isHost = true;
 
-            const roomRef = ref(db, `rooms/${localState.roomCode}`);
-            await set(roomRef, {
-                host: localState.uid,
-                createdAt: serverTimestamp(),
-                gameState: {
-                    phase: 'waiting',
-                    currentTopic: '',
-                    timerMode: 120,
-                    timer: 0
-                }
-            });
+            try {
+                const roomRef = ref(db, rooms/${localState.roomCode});
+                await set(roomRef, {
+                    host: localState.uid,
+                    createdAt: serverTimestamp(),
+                    gameState: {
+                        phase: 'waiting',
+                        currentRound: 1,
+                        maxRounds: 3,
+                        currentTopic: '',
+                        timer: 0
+                    }
+                });
 
-            await joinRoomAsPlayer();
-            document.getElementById('roomCode').value = localState.roomCode;
-            showToast(`ルーム ${localState.roomCode} を作成しました`);
+                await joinRoomAsPlayer();
+                document.getElementById('roomCode').value = localState.roomCode;
+                showToast(ルーム ${localState.roomCode} を作成しました);
+            } catch (error) {
+                console.error('Error creating room:', error);
+                showToast('ルームの作成に失敗しました');
+            }
         };
 
         window.joinRoom = async function() {
@@ -389,25 +605,38 @@
             localState.roomCode = code;
             localState.isHost = false;
 
-            await joinRoomAsPlayer();
+            try {
+                const roomSnapshot = await get(ref(db, rooms/${code}));
+                if (!roomSnapshot.exists()) {
+                    showToast('ルームが見つかりません');
+                    return;
+                }
+
+                await joinRoomAsPlayer();
+            } catch (error) {
+                console.error('Error joining room:', error);
+                showToast('ルームへの参加に失敗しました');
+            }
         };
 
         async function joinRoomAsPlayer() {
-            const playerRef = ref(db, `rooms/${localState.roomCode}/players/${localState.uid}`);
+            const playerRef = ref(db, rooms/${localState.roomCode}/players/${localState.uid});
             await set(playerRef, {
                 name: localState.playerName,
                 score: 0,
-                joinedAt: serverTimestamp()
+                joinedAt: serverTimestamp(),
+                reactionsSent: 0
             });
 
             onDisconnect(playerRef).remove();
 
-            localState.currentRoom = ref(db, `rooms/${localState.roomCode}`);
+            localState.currentRoomRef = ref(db, rooms/${localState.roomCode});
             setupRealtimeListeners();
 
             document.getElementById('roomSection').classList.add('hidden');
             document.getElementById('gameArea').classList.remove('hidden');
             document.getElementById('handArea').style.display = 'block';
+            document.getElementById('likeButtonContainer').classList.remove('hidden');
             
             if (localState.isHost) {
                 document.getElementById('drawTopicBtn').classList.remove('hidden');
@@ -416,7 +645,7 @@
         }
 
         function setupRealtimeListeners() {
-            onValue(localState.currentRoom, (snapshot) => {
+            const roomListener = onValue(localState.currentRoomRef, (snapshot) => {
                 const data = snapshot.val();
                 if (!data) return;
 
@@ -429,32 +658,59 @@
                     location.reload();
                 }
             });
+
+            const chatListener = onValue(ref(db, rooms/${localState.roomCode}/chat), (snapshot) => {
+                const messages = snapshot.val() || {};
+                updateChatMessages(messages);
+            });
+
+            const reactionsListener = onValue(ref(db, rooms/${localState.roomCode}/reactions/${localState.uid}), (snapshot) => {
+                const reactions = snapshot.val() || {};
+                Object.entries(reactions).forEach(([key, reaction]) => {
+                    if (!reaction.shown) {
+                        showToast(${reaction.fromName}さんから「${reaction.text}」が心にとどきました！, true);
+                        update(ref(db, rooms/${localState.roomCode}/reactions/${localState.uid}/${key}), { shown: true });
+                    }
+                });
+            });
+
+            localState.listeners = [roomListener, chatListener, reactionsListener];
         }
 
         function updateRoomInfo(data) {
             const players = Object.values(data.players || {});
-            document.getElementById('roomInfo').innerHTML = `
+            const currentRound = data.gameState?.currentRound || 1;
+            
+            document.getElementById('roomInfo').innerHTML = 
                 <p>ルームコード: <strong>${localState.roomCode}</strong></p>
                 <p>参加者: ${players.length}人</p>
                 <p>ホスト: ${localState.isHost ? 'あなた' : '他のプレイヤー'}</p>
-            `;
+            ;
+            
+            document.getElementById('roundInfo').textContent = ラウンド ${currentRound} / ${localState.maxRounds};
         }
 
         function updateScoreBoard(players) {
             const scores = Object.entries(players)
-                .map(([uid, player]) => ({ name: player.name, score: player.score || 0 }))
+                .map(([uid, player]) => ({ 
+                    name: player.name, 
+                    score: player.score || 0,
+                    reactionsSent: player.reactionsSent || 0 
+                }))
                 .sort((a, b) => b.score - a.score);
 
-            document.getElementById('scoreBoard').innerHTML = scores.map(player => `
+            document.getElementById('scoreBoard').innerHTML = scores.map(player => 
                 <div class="score-item">
                     <span>${player.name}</span>
                     <span>${player.score}点</span>
                 </div>
-            `).join('');
+            ).join('');
         }
 
         function updateGameState(gameState) {
-            const { phase, currentTopic, timer, answers, presentationData } = gameState;
+            const { phase, currentTopic, timer, answers, presentationData, currentRound } = gameState;
+
+            localState.currentRound = currentRound || 1;
 
             if (phase === 'topic' && currentTopic) {
                 document.getElementById('topicText').textContent = currentTopic;
@@ -474,42 +730,90 @@
                 showPresentation(presentationData);
             }
 
+            if (phase === 'catchball' && presentationData) {
+                showCatchBallTime(presentationData);
+            }
+
             if (phase === 'reaction' && presentationData) {
                 showReactionSelection(presentationData);
+            }
+
+            if (phase === 'roundEnd') {
+                handleRoundEnd();
+            }
+
+            if (phase === 'gameEnd') {
+                showFinalResults();
             }
         }
 
         function updateTimer(seconds) {
             const minutes = Math.floor(seconds / 60);
             const secs = seconds % 60;
-            document.getElementById('timerText').textContent = `${minutes}:${secs.toString().padStart(2, '0')}`;
+            document.getElementById('timerText').textContent = ${minutes}:${secs.toString().padStart(2, '0')};
             document.getElementById('timerContainer').classList.remove('hidden');
         }
 
         window.drawTopic = async function() {
             const trigger = shuffle(triggerCards)[0];
             
-            const modalContent = `
+            const modalContent = 
                 <h2>${trigger}</h2>
                 <p>〇〇の部分を決めてください</p>
                 <button class="btn" onclick="selectWordMethod('self', '${trigger}')">自分で入力（得点2倍）</button>
                 <button class="btn btn-secondary" onclick="selectWordMethod('card', '${trigger}')">ワードカードから選ぶ</button>
-            `;
+            ;
             showModal(modalContent);
         };
 
         window.selectWordMethod = async function(method, trigger) {
             if (method === 'self') {
-                const modalContent = `
+                const modalContent = 
                     <h2>〇〇を入力してください</h2>
-                    <input type="text" id="customWord" class="input-field">
+                    <input type="text" id="customWord" class="input-field" autofocus>
                     <button class="btn" onclick="setTopic('${trigger}', document.getElementById('customWord').value, true)">決定</button>
-                `;
+                ;
                 showModal(modalContent);
+                setTimeout(() => document.getElementById('customWord').focus(), 100);
             } else {
-                const word = shuffle(wordCards)[0];
-                setTopic(trigger, word, false);
+                showRouletteModal(trigger);
             }
+        };
+
+        function showRouletteModal(trigger) {
+            const shuffledWords = [];
+            for (let i = 0; i < 5; i++) {
+                shuffledWords.push(...shuffle(wordCards));
+            }
+            
+            const modalContent = 
+                <h2>ワードカードルーレット</h2>
+                <div class="roulette-container">
+                    <div class="roulette-wheel">
+                        <div class="roulette-pointer"></div>
+                        <div class="roulette-strip" id="rouletteStrip">
+                            ${shuffledWords.map(word => <div class="roulette-item">${word}</div>).join('')}
+                        </div>
+                    </div>
+                    <button class="btn" onclick="startRoulette('${trigger}')">スタート！</button>
+                </div>
+            ;
+            showModal(modalContent);
+        }
+
+        window.startRoulette = function(trigger) {
+            const strip = document.getElementById('rouletteStrip');
+            const totalItems = strip.children.length;
+            const itemWidth = 300;
+            const randomIndex = Math.floor(Math.random() * wordCards.length) + wordCards.length * 2;
+            const finalPosition = -(randomIndex * itemWidth) + 150;
+            
+            strip.style.transform = translateX(${finalPosition}px);
+            
+            setTimeout(() => {
+                const selectedWord = wordCards[randomIndex % wordCards.length];
+                setTopic(trigger, selectedWord, false);
+            }, 3000);
         };
 
         window.setTopic = async function(trigger, word, isDouble) {
@@ -517,10 +821,11 @@
 
             const topic = trigger.replace('〇〇', word);
             
-            await set(ref(db, `rooms/${localState.roomCode}/gameState`), {
+            await set(ref(db, rooms/${localState.roomCode}/gameState), {
                 phase: 'answering',
                 currentTopic: topic,
-                timerMode: 120,
+                currentRound: localState.currentRound,
+                maxRounds: localState.maxRounds,
                 timer: 120,
                 doublePoint: isDouble ? localState.uid : null
             });
@@ -533,7 +838,7 @@
             let timeLeft = 120;
             localState.timerInterval = setInterval(async () => {
                 timeLeft--;
-                await set(ref(db, `rooms/${localState.roomCode}/gameState/timer`), timeLeft);
+                await set(ref(db, rooms/${localState.roomCode}/gameState/timer), timeLeft);
                 
                 if (timeLeft <= 0) {
                     clearInterval(localState.timerInterval);
@@ -545,18 +850,18 @@
         }
 
         function showAnswerInput() {
-            document.getElementById('handContent').innerHTML = `
+            document.getElementById('handContent').innerHTML = 
                 <h3>あなたの回答</h3>
                 <input type="text" id="myAnswer" class="input-field" placeholder="回答を入力">
                 <button class="btn" onclick="submitAnswer()">送信</button>
-            `;
+            ;
         }
 
         window.submitAnswer = async function() {
             const answer = document.getElementById('myAnswer').value.trim();
             if (!answer) return;
 
-            await set(ref(db, `rooms/${localState.roomCode}/gameState/answers/${localState.uid}`), {
+            await set(ref(db, rooms/${localState.roomCode}/gameState/answers/${localState.uid}), {
                 text: answer,
                 playerName: localState.playerName
             });
@@ -567,20 +872,17 @@
 
         function updateAnswerStatus(answers) {
             const players = Object.keys(answers).length;
-            document.getElementById('answerStatus').innerHTML = `
+            document.getElementById('answerStatus').innerHTML = 
                 <p>回答済み: ${players}人</p>
-            `;
+            ;
         }
 
         window.startPresentation = async function() {
-            const snapshot = await new Promise(resolve => {
-                onValue(ref(db, `rooms/${localState.roomCode}/gameState/answers`), resolve, { onlyOnce: true });
-            });
-            
+            const snapshot = await get(ref(db, rooms/${localState.roomCode}/gameState/answers));
             const answers = snapshot.val() || {};
             const order = shuffle(Object.keys(answers));
             
-            await set(ref(db, `rooms/${localState.roomCode}/gameState`), {
+            await update(ref(db, rooms/${localState.roomCode}/gameState), {
                 phase: 'presentation',
                 presentationData: {
                     order: order,
@@ -593,112 +895,392 @@
         function showPresentation(data) {
             const { order, currentIndex, answers } = data;
             if (currentIndex >= order.length) {
-                finishRound();
+                handleRoundEnd();
                 return;
             }
 
+            document.getElementById('presentationArea').classList.remove('hidden');
+            document.getElementById('startPresentBtn').classList.add('hidden');
+            
             const currentUid = order[currentIndex];
             const answer = answers[currentUid];
             
-            document.getElementById('presentationContent').innerHTML = `
+            document.getElementById('presentationContent').innerHTML = 
                 <div class="answer-display">
                     <h3>${answer.playerName}の回答</h3>
-                    <p style="font-size: 24px; margin: 20px 0;">${answer.text}</p>
+                    <p style="font-size: 28px; margin: 20px 0; font-weight: 700;">${answer.text}</p>
                     <p>30秒で説明してください</p>
                 </div>
-            `;
+            ;
 
             if (localState.isHost) {
                 setTimeout(async () => {
-                    await set(ref(db, `rooms/${localState.roomCode}/gameState/phase`), 'reaction');
+                    await update(ref(db, rooms/${localState.roomCode}/gameState), {
+                        phase: 'catchball',
+                        catchBallTimer: 120
+                    });
                 }, 30000);
             }
+        }
+
+        function showCatchBallTime(data) {
+            document.getElementById('catchBallTimeContainer').classList.remove('hidden');
+            document.getElementById('chatMessages').innerHTML = '';
+            
+            if (localState.isHost) {
+                startCatchBallTimer();
+            }
+            
+            const currentUid = data.order[data.currentIndex];
+            if (localState.isHost || localState.uid === currentUid) {
+                document.getElementById('skipCatchBallBtn').style.display = 'block';
+            } else {
+                document.getElementById('skipCatchBallBtn').style.display = 'none';
+            }
+        }
+
+        function startCatchBallTimer() {
+            let timeLeft = 120;
+            localState.catchBallTimerInterval = setInterval(async () => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('catchBallTimer').textContent = ${minutes}:${seconds.toString().padStart(2, '0')};
+                
+                if (timeLeft <= 0) {
+                    clearInterval(localState.catchBallTimerInterval);
+                    await moveToReactionPhase();
+                }
+            }, 1000);
+        }
+
+        window.skipCatchBall = async function() {
+            if (localState.catchBallTimerInterval) {
+                clearInterval(localState.catchBallTimerInterval);
+            }
+            await moveToReactionPhase();
+        };
+
+        async function moveToReactionPhase() {
+            await update(ref(db, rooms/${localState.roomCode}/gameState), {
+                phase: 'reaction',
+                reactionTimer: 30
+            });
+        }
+
+        window.sendChatMessage = async function() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatRef = push(ref(db, rooms/${localState.roomCode}/chat));
+            await set(chatRef, {
+                playerName: localState.playerName,
+                message: message,
+                timestamp: serverTimestamp()
+            });
+
+            input.value = '';
+        };
+
+        window.handleChatKeyPress = function(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        };
+
+        function updateChatMessages(messages) {
+            const chatContainer = document.getElementById('chatMessages');
+            const sortedMessages = Object.entries(messages)
+                .sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+            
+            chatContainer.innerHTML = sortedMessages.map(([key, msg]) => 
+                <div class="chat-message">
+                    <strong>${msg.playerName}:</strong> ${msg.message}
+                </div>
+            ).join('');
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         function showReactionSelection(data) {
             const { order, currentIndex, answers } = data;
             const currentUid = order[currentIndex];
             
+            document.getElementById('catchBallTimeContainer').classList.add('hidden');
+            
+            if (localState.catchBallTimerInterval) {
+                clearInterval(localState.catchBallTimerInterval);
+            }
+            
             if (currentUid === localState.uid) {
-                document.getElementById('handContent').innerHTML = '<p>他のプレイヤーがリアクションを選んでいます...</p>';
+                document.getElementById('handContent').innerHTML = 
+                    <div style="text-align: center; padding: 20px;">
+                        <h3>他のプレイヤーがリアクションを選んでいます...</h3>
+                    </div>
+                ;
                 return;
             }
 
-            document.getElementById('handContent').innerHTML = `
-                <h3>リアクションを選んでください</h3>
-                <div class="reaction-cards">
-                    ${reactionCards.map((card, i) => `
-                        <div class="reaction-card" onclick="sendReaction(${i}, '${currentUid}')">
-                            <div>${card.text}</div>
-                            <div>${card.point}点</div>
-                        </div>
-                    `).join('')}
+            const availableCards = baseReactionCardTexts.map((text, index) => ({
+                text,
+                index,
+                used: localState.usedReactionCardIndexes.includes(index)
+            }));
+
+            document.getElementById('handContent').innerHTML = 
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h3 style="color: #ff69b4; font-size: 20px;">
+                        カードに書かれている言葉を読み上げて、<br>
+                        気持ちを込めて渡してくださいね。
+                    </h3>
                 </div>
-            `;
+                <div class="reaction-cards">
+                    ${availableCards.map(card => 
+                        <div class="reaction-card ${card.used ? 'used' : ''}" 
+                             onclick="${card.used ? '' : sendReaction(${card.index}, '${currentUid}')}">
+                            <div>${card.text}</div>
+                        </div>
+                    ).join('')}
+                </div>
+            ;
+
+            if (localState.isHost) {
+                setTimeout(async () => {
+                    await nextPresentationOrEnd();
+                }, 30000);
+            }
         }
 
         window.sendReaction = async function(index, targetUid) {
-            const reaction = reactionCards[index];
-            const snapshot = await new Promise(resolve => {
-                onValue(ref(db, `rooms/${localState.roomCode}`), resolve, { onlyOnce: true });
-            });
+            const reactionText = baseReactionCardTexts[index];
+            const points = Math.floor(Math.random() * 5) + 1;
             
+            const snapshot = await get(ref(db, rooms/${localState.roomCode}));
             const roomData = snapshot.val();
             const isDouble = roomData.gameState.doublePoint === targetUid;
-            const points = reaction.point * (isDouble ? 2 : 1);
+            const finalPoints = points * (isDouble ? 2 : 1);
             
+            // Update target player's score
             const currentScore = roomData.players[targetUid].score || 0;
-            await set(ref(db, `rooms/${localState.roomCode}/players/${targetUid}/score`), currentScore + points);
+            await set(ref(db, rooms/${localState.roomCode}/players/${targetUid}/score), currentScore + finalPoints);
             
-            document.getElementById('handContent').innerHTML = '<p>リアクションを送信しました</p>';
+            // Update sender's reaction count
+            const currentReactionsSent = roomData.players[localState.uid].reactionsSent || 0;
+            await set(ref(db, rooms/${localState.roomCode}/players/${localState.uid}/reactionsSent), currentReactionsSent + 1);
             
-            if (localState.isHost) {
-                setTimeout(async () => {
-                    const nextIndex = roomData.gameState.presentationData.currentIndex + 1;
-                    if (nextIndex >= roomData.gameState.presentationData.order.length) {
-                        await finishRound();
-                    } else {
-                        await set(ref(db, `rooms/${localState.roomCode}/gameState/presentationData/currentIndex`), nextIndex);
-                        await set(ref(db, `rooms/${localState.roomCode}/gameState/phase`), 'presentation');
-                    }
-                }, 2000);
-            }
-        };
-
-        async function finishRound() {
-            await set(ref(db, `rooms/${localState.roomCode}/gameState`), {
-                phase: 'waiting',
-                currentTopic: '',
-                timer: 0
+            // Send reaction notification
+            const reactionRef = push(ref(db, rooms/${localState.roomCode}/reactions/${targetUid}));
+            await set(reactionRef, {
+                fromUid: localState.uid,
+                fromName: localState.playerName,
+                text: reactionText,
+                points: finalPoints,
+                round: localState.currentRound,
+                shown: false
             });
             
-            document.getElementById('topicText').textContent = 'ホストがお題を引くのを待っています...';
-            document.getElementById('timerContainer').classList.add('hidden');
-            document.getElementById('presentationContent').innerHTML = '';
-            document.getElementById('handContent').innerHTML = '';
+            // Mark card as used
+            localState.usedReactionCardIndexes.push(index);
             
-            if (localState.isHost) {
-                document.getElementById('drawTopicBtn').classList.remove('hidden');
+            // Store reaction details for final results
+            const detailRef = push(ref(db, rooms/${localState.roomCode}/reactionDetails));
+            await set(detailRef, {
+                fromUid: localState.uid,
+                fromName: localState.playerName,
+                toUid: targetUid,
+                toName: roomData.players[targetUid].name,
+                text: reactionText,
+                points: finalPoints,
+                round: localState.currentRound
+            });
+            
+            document.getElementById('handContent').innerHTML = '<p style="text-align: center; font-size: 20px;">リアクションを送信しました！</p>';
+        };
+
+        async function nextPresentationOrEnd() {
+            const snapshot = await get(ref(db, rooms/${localState.roomCode}/gameState));
+            const gameState = snapshot.val();
+            const nextIndex = gameState.presentationData.currentIndex + 1;
+            
+            if (nextIndex >= gameState.presentationData.order.length) {
+                await handleRoundEnd();
+            } else {
+                await update(ref(db, rooms/${localState.roomCode}/gameState), {
+                    'presentationData/currentIndex': nextIndex,
+                    phase: 'presentation'
+                });
             }
         }
 
-        function showModal(content) {
+        async function handleRoundEnd() {
+            localState.usedReactionCardIndexes = [];
+            
+            const snapshot = await get(ref(db, rooms/${localState.roomCode}/gameState));
+            const currentRound = snapshot.val().currentRound || 1;
+            
+            if (currentRound >= localState.maxRounds) {
+                await update(ref(db, rooms/${localState.roomCode}/gameState), {
+                    phase: 'gameEnd'
+                });
+            } else {
+                await update(ref(db, rooms/${localState.roomCode}/gameState), {
+                    phase: 'waiting',
+                    currentRound: currentRound + 1,
+                    currentTopic: '',
+                    timer: 0,
+                    answers: null,
+                    presentationData: null
+                });
+                
+                // Clear chat for new round
+                await remove(ref(db, rooms/${localState.roomCode}/chat));
+                
+                document.getElementById('topicText').textContent = 'ホストがお題を引くのを待っています...';
+                document.getElementById('timerContainer').classList.add('hidden');
+                document.getElementById('presentationArea').classList.add('hidden');
+                document.getElementById('presentationContent').innerHTML = '';
+                document.getElementById('catchBallTimeContainer').classList.add('hidden');
+                document.getElementById('handContent').innerHTML = '';
+                document.getElementById('answerStatus').innerHTML = '';
+                
+                if (localState.isHost) {
+                    document.getElementById('drawTopicBtn').classList.remove('hidden');
+                    document.getElementById('startPresentBtn').classList.remove('hidden');
+                }
+            }
+        }
+
+        async function showFinalResults() {
+            const snapshot = await get(ref(db, rooms/${localState.roomCode}));
+            const roomData = snapshot.val();
+            const players = roomData.players || {};
+            const reactionDetails = roomData.reactionDetails || {};
+            
+            // Calculate winners
+            let waiwaiKing = { name: '', score: 0 };
+            let emotionalDoctor = { name: '', count: 0 };
+            
+            Object.entries(players).forEach(([uid, player]) => {
+                if (player.score > waiwaiKing.score) {
+                    waiwaiKing = { name: player.name, score: player.score };
+                }
+                if (player.reactionsSent > emotionalDoctor.count) {
+                    emotionalDoctor = { name: player.name, count: player.reactionsSent };
+                }
+            });
+            
+            // Build detail breakdown
+            const playerDetails = {};
+            Object.values(reactionDetails).forEach(detail => {
+                if (!playerDetails[detail.toUid]) {
+                    playerDetails[detail.toUid] = {
+                        name: detail.toName,
+                        reactions: []
+                    };
+                }
+                playerDetails[detail.toUid].reactions.push(detail);
+            });
+            
+            const modalContent = 
+                <div class="final-results">
+                    <h2 style="text-align: center; margin-bottom: 30px;">🎉 最終結果発表 🎉</h2>
+                    
+                    <div class="winner-section">
+                        <div class="winner-icon">👑</div>
+                        <h3>わいわいキング</h3>
+                        <p style="font-size: 24px;">${waiwaiKing.name}</p>
+                        <p style="font-size: 20px;">${waiwaiKing.score}点</p>
+                    </div>
+                    
+                    <div class="winner-section" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="winner-icon">🎓</div>
+                        <h3>エモーショナル博士</h3>
+                        <p style="font-size: 24px;">${emotionalDoctor.name}</p>
+                        <p style="font-size: 20px;">${emotionalDoctor.count}枚のリアクションカードを贈りました</p>
+                    </div>
+                    
+                    <div class="score-details">
+                        <h4>詳細スコア</h4>
+                        ${Object.entries(playerDetails).map(([uid, data]) => 
+                            <div style="margin-bottom: 20px;">
+                                <h5 style="color: #333; margin-bottom: 10px;">${data.name}さんが受け取ったリアクション</h5>
+                                ${data.reactions.map(r => 
+                                    <div class="detail-item">
+                                        ラウンド${r.round}: ${r.fromName}さんから「${r.text}」(${r.points}点)
+                                    </div>
+                                ).join('')}
+                            </div>
+                        ).join('')}
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="btn" onclick="location.reload()">新しいゲームを始める</button>
+                    </div>
+                </div>
+            ;
+            
+            showModal(modalContent, false);
+        }
+
+        window.triggerHeartAnimation = function(event) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-animation';
+            heart.innerHTML = '❤️';
+            heart.style.left = event.clientX - 15 + 'px';
+            heart.style.top = event.clientY - 15 + 'px';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 1500);
+        };
+
+        function showModal(content, closable = true) {
             document.getElementById('modalContent').innerHTML = content;
-            document.getElementById('modal').style.display = 'block';
+            const modal = document.getElementById('modal');
+            modal.style.display = 'flex';
+            
+            if (closable) {
+                modal.onclick = function(event) {
+                    if (event.target === modal) {
+                        hideModal();
+                    }
+                };
+            } else {
+                modal.onclick = null;
+            }
         }
 
         function hideModal() {
             document.getElementById('modal').style.display = 'none';
         }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('modal');
-            if (event.target === modal) {
-                hideModal();
+        // Initialize
+        document.getElementById('playerName').focus();
+                // ================================
+        // 追加：全員のリアクション送信監視とリスナー解放
+        // ================================
+        // ページ終了時にFirebaseリスナー解放
+        window.addEventListener('beforeunload', () => {
+            if (localState.listeners && localState.listeners.length) {
+                localState.listeners.forEach(unsub => typeof unsub === 'function' && unsub());
             }
-        };
+        });
 
-        /* TODO: セキュリティルール / オフラインキャッシュ / 大人数対応 */
+        // （オプション）リアクションが全員分送信されたら自動で次へ進む
+        // ※必要であれば sendReaction の末尾に以下を追加
+        /*
+        const snapshot2 = await get(ref(db, `rooms/${localState.roomCode}`));
+        const players2 = Object.keys(snapshot2.val().players || {});
+        const reactionSnap = await get(ref(db, `rooms/${localState.roomCode}/gameState/presentationData/reactionsSent`));
+        const reactionsSent = reactionSnap.val() || {};
+        // 自分がまだ反映前なので+1で比較
+        if (Object.keys(reactionsSent).length + 1 >= players2.length - 1) {
+            await nextPresentationOrEnd();
+        }
+        */
+
+        // 何か追加で必要な処理があればここに
+
     </script>
 </body>
 </html>
