@@ -1,551 +1,704 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>多様性を照らすカードゲーム</title>
-   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-   <style>
-       * {
-           margin: 0;
-           padding: 0;
-           box-sizing: border-box;
-       }
-       body {
-           font-family: 'Noto Sans JP', sans-serif;
-           background: #f0f4f8;
-           color: #333;
-           min-height: 100vh;
-           display: flex;
-       }
-       .main-container {
-           flex: 1;
-           padding: 20px;
-           max-width: 800px;
-           margin: 0 auto;
-       }
-       .sidebar {
-           width: 300px;
-           background: #fff;
-           padding: 20px;
-           box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-       }
-       .game-title {
-           text-align: center;
-           font-size: 24px;
-           font-weight: 700;
-           margin-bottom: 30px;
-       }
-       .setup-section {
-           background: #fff;
-           padding: 30px;
-           border-radius: 10px;
-           box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-           margin-bottom: 20px;
-       }
-       .player-input {
-           margin: 10px 0;
-       }
-       .player-input input {
-           width: 100%;
-           padding: 8px;
-           border: 1px solid #ddd;
-           border-radius: 5px;
-           font-size: 16px;
-       }
-       .btn {
-           background: #4CAF50;
-           color: white;
-           border: none;
-           padding: 10px 20px;
-           border-radius: 5px;
-           cursor: pointer;
-           font-size: 16px;
-           margin: 10px 5px;
-       }
-       .btn:hover {
-           background: #45a049;
-       }
-       .btn-secondary {
-           background: #2196F3;
-       }
-       .btn-secondary:hover {
-           background: #1976D2;
-       }
-       .game-area {
-           display: none;
-       }
-       .topic-card {
-           background: #fff;
-           padding: 20px;
-           border-radius: 10px;
-           text-align: center;
-           font-size: 20px;
-           margin: 20px 0;
-           box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-       }
-       .player-area {
-           display: grid;
-           grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-           gap: 15px;
-           margin: 20px 0;
-       }
-       .player-card {
-           background: #fff;
-           padding: 15px;
-           border-radius: 10px;
-           box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-       }
-       .player-card h3 {
-           margin-bottom: 10px;
-           color: #333;
-       }
-       .timer-container {
-           position: relative;
-           width: 120px;
-           height: 120px;
-           margin: 20px auto;
-       }
-       .timer-circle {
-           transform: rotate(-90deg);
-       }
-       .timer-text {
-           position: absolute;
-           top: 50%;
-           left: 50%;
-           transform: translate(-50%, -50%);
-           font-size: 24px;
-           font-weight: 700;
-       }
-       .modal {
-           display: none;
-           position: fixed;
-           top: 0;
-           left: 0;
-           width: 100%;
-           height: 100%;
-           background: rgba(0,0,0,0.5);
-           z-index: 1000;
-       }
-       .modal-content {
-           position: absolute;
-           top: 50%;
-           left: 50%;
-           transform: translate(-50%, -50%);
-           background: #fff;
-           padding: 30px;
-           border-radius: 10px;
-           width: 90%;
-           max-width: 500px;
-       }
-       .score-board {
-           background: #f8f9fa;
-           padding: 15px;
-           border-radius: 10px;
-           margin-bottom: 20px;
-       }
-       .score-item {
-           display: flex;
-           justify-content: space-between;
-           padding: 8px 0;
-           border-bottom: 1px solid #ddd;
-       }
-       .audio-control {
-           position: fixed;
-           bottom: 20px;
-           right: 20px;
-           z-index: 100;
-       }
-       .hidden {
-           display: none;
-       }
-       @media (max-width: 768px) {
-           body {
-               flex-direction: column;
-           }
-           .sidebar {
-               width: 100%;
-               order: 2;
-           }
-           .main-container {
-               order: 1;
-           }
-       }
-   </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多様性を照らすカードゲーム - オンライン版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+        }
+        .main-container {
+            flex: 1;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .sidebar {
+            width: 300px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+        }
+        .game-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+        .room-section {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #2196F3;
+        }
+        .btn-secondary:hover {
+            background: #1976D2;
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .topic-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .player-area {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .hand-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .reaction-cards {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        .reaction-card {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            min-width: 120px;
+            text-align: center;
+        }
+        .reaction-card:hover {
+            border-color: #4CAF50;
+        }
+        .timer-container {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .score-board {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 2000;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .hidden {
+            display: none;
+        }
+        .answer-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            .main-container {
+                order: 1;
+                padding-bottom: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
-   <div class="main-container">
-       <h1 class="game-title">多様性を照らすカードゲーム</h1>
-       
-       <div class="setup-section" id="setup">
-           <h2>ゲーム設定</h2>
-           <div id="playerInputs">
-               <div class="player-input">
-                   <input type="text" placeholder="プレイヤー1の名前" id="player1">
-               </div>
-               <div class="player-input">
-                   <input type="text" placeholder="プレイヤー2の名前" id="player2">
-               </div>
-               <div class="player-input">
-                   <input type="text" placeholder="プレイヤー3の名前" id="player3">
-               </div>
-               <div class="player-input">
-                   <input type="text" placeholder="プレイヤー4の名前" id="player4">
-               </div>
-           </div>
-           <div>
-               <label>
-                   <input type="radio" name="timerMode" value="120" checked> 通常モード（2分）
-               </label>
-               <label>
-                   <input type="radio" name="timerMode" value="60"> 早押しモード（1分）
-               </label>
-           </div>
-           <button class="btn" onclick="startGame()">ゲーム開始</button>
-       </div>
+    <div class="main-container">
+        <h1 class="game-title">多様性を照らすカードゲーム</h1>
+        
+        <div class="room-section" id="roomSection">
+            <h2>ルーム設定</h2>
+            <input type="text" id="playerName" class="input-field" placeholder="あなたの名前">
+            <input type="text" id="roomCode" class="input-field" placeholder="ルームコード（4文字）">
+            <div>
+                <button class="btn" onclick="createRoom()">ルーム作成</button>
+                <button class="btn btn-secondary" onclick="joinRoom()">ルーム参加</button>
+            </div>
+        </div>
 
-       <div class="game-area" id="gameArea">
-           <div class="topic-card" id="topicCard">
-               <button class="btn" onclick="drawTopic()">お題を引く</button>
-           </div>
-           
-           <div class="timer-container hidden" id="timerContainer">
-               <svg width="120" height="120" class="timer-circle">
-                   <circle cx="60" cy="60" r="50" stroke="#ddd" stroke-width="10" fill="none"/>
-                   <circle id="timerCircle" cx="60" cy="60" r="50" stroke="#4CAF50" stroke-width="10" fill="none"
-                       stroke-dasharray="314" stroke-dashoffset="0"/>
-               </svg>
-               <div class="timer-text" id="timerText">0:00</div>
-           </div>
-           
-           <div class="player-area" id="playerArea"></div>
-           
-           <div class="hidden" id="presentationArea">
-               <button class="btn" onclick="startPresentation()">発表開始</button>
-           </div>
-       </div>
-   </div>
+        <div class="game-area hidden" id="gameArea">
+            <div class="topic-card" id="topicCard">
+                <p id="topicText">ホストがお題を引くのを待っています...</p>
+                <button class="btn hidden" id="drawTopicBtn" onclick="drawTopic()">お題を引く</button>
+            </div>
+            
+            <div class="timer-container hidden" id="timerContainer">
+                <div id="timerText">0:00</div>
+            </div>
+            
+            <div class="player-area" id="playerArea">
+                <h3>回答状況</h3>
+                <div id="answerStatus"></div>
+            </div>
 
-   <div class="sidebar">
-       <h2>スコアボード</h2>
-       <div class="score-board" id="scoreBoard"></div>
-       <div id="reactionHistory"></div>
-   </div>
+            <div class="hidden" id="presentationArea">
+                <button class="btn hidden" id="startPresentBtn" onclick="startPresentation()">発表開始</button>
+                <div id="presentationContent"></div>
+            </div>
+        </div>
+    </div>
 
-   <div class="modal" id="modal">
-       <div class="modal-content" id="modalContent"></div>
-   </div>
+    <div class="sidebar">
+        <h2>ルーム情報</h2>
+        <div id="roomInfo"></div>
+        <h2>スコアボード</h2>
+        <div class="score-board" id="scoreBoard"></div>
+    </div>
 
-   <div class="audio-control">
-       <button class="btn btn-secondary" onclick="toggleBGM()">BGM ON/OFF</button>
-   </div>
+    <div class="hand-area" id="handArea">
+        <div id="handContent"></div>
+    </div>
 
-   <audio id="bgm" loop>
-       <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
-   </audio>
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
 
-   <script>
-       const triggerCards = [
-           "この世にまだない〇〇は？",
-           "だらしない〇〇は？",
-           "今社会に必要な〇〇は？",
-           "ありそうでない〇〇は？",
-           "明日の〇〇は？",
-           "戦国時代の〇〇は？",
-           "100年後の〇〇は？",
-           "友達になりたくない〇〇は？",
-           "思わず〇〇してしまうことは？",
-           "ちょっと怖い〇〇は？",
-           "みんなが気づいていない〇〇は？",
-           "夢でも見ない〇〇は？",
-           "今の時代だからこその〇〇は？",
-           "無人島だからこその〇〇は？"
-       ];
+    <div class="toast" id="toast"></div>
 
-       const wordCards = [
-           "感情","季節","食べ物","乗り物",
-           "服","遊び","場所","人物",
-           "色","動物","道具","音楽"
-       ];
+    <script type="module">
+        // Firebase設定（環境に応じて変更してください）
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_ID.firebaseio.com",
+            projectId: "YOUR_ID",
+            storageBucket: "YOUR_ID.appspot.com",
+            messagingSenderId: "#######",
+            appId: "#######"
+        };
 
-       const reactionCards = [
-           {text:"ユニーク！",point:3},
-           {text:"実用的！",point:2},
-           {text:"びっくり！",point:3},
-           {text:"感動的！",point:3},
-           {text:"わかりやすいね",point:2},
-           {text:"おもしろい！",point:3},
-           {text:"あたらしい！",point:3},
-           {text:"活気があるね",point:2},
-           {text:"挑戦的！",point:3},
-           {text:"やまとなでしこだね",point:2},
-           {text:"おしゃれだね",point:2},
-           {text:"温故知新だね",point:2},
-           {text:"低姿勢だね",point:1},
-           {text:"せやね",point:1},
-           {text:"しみるね",point:2},
-           {text:"うまれたね",point:2},
-           {text:"なるほど",point:1},
-           {text:"それそれ",point:1},
-           {text:"やられた！",point:3},
-           {text:"うひょー！",point:3}
-       ];
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, push, remove, onDisconnect, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-       let gameState = {
-           players: [],
-           currentTopic: '',
-           currentTrigger: '',
-           currentPlayer: 0,
-           answers: {},
-           scores: {},
-           timerMode: 120,
-           timerInterval: null,
-           presentationOrder: [],
-           presentationIndex: 0,
-           doublePointFlags: {}
-       };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-       function shuffle(array) {
-           const arr = [...array];
-           for (let i = arr.length - 1; i > 0; i--) {
-               const j = Math.floor(Math.random() * (i + 1));
-               [arr[i], arr[j]] = [arr[j], arr[i]];
-           }
-           return arr;
-       }
+        const triggerCards = [
+            "この世にまだない〇〇は？",
+            "だらしない〇〇は？",
+            "今社会に必要な〇〇は？",
+            "ありそうでない〇〇は？",
+            "明日の〇〇は？",
+            "戦国時代の〇〇は？",
+            "100年後の〇〇は？",
+            "友達になりたくない〇〇は？",
+            "思わず〇〇してしまうことは？",
+            "ちょっと怖い〇〇は？",
+            "みんなが気づいていない〇〇は？",
+            "夢でも見ない〇〇は？",
+            "今の時代だからこその〇〇は？",
+            "無人島だからこその〇〇は？"
+        ];
 
-       function startGame() {
-           const players = [];
-           for (let i = 1; i <= 4; i++) {
-               const name = document.getElementById(`player${i}`).value;
-               if (name) players.push(name);
-           }
-           
-           if (players.length < 2) {
-               alert('最低2人のプレイヤーが必要です');
-               return;
-           }
-           
-           gameState.players = players;
-           gameState.timerMode = parseInt(document.querySelector('input[name="timerMode"]:checked').value);
-           players.forEach(p => {
-               gameState.scores[p] = 0;
-               gameState.answers[p] = '';
-               gameState.doublePointFlags[p] = false;
-           });
-           
-           document.getElementById('setup').style.display = 'none';
-           document.getElementById('gameArea').style.display = 'block';
-           updateScoreBoard();
-           
-           const bgm = document.getElementById('bgm');
-           bgm.volume = 0.3;
-           bgm.play().catch(e => console.log('BGM autoplay blocked'));
-       }
+        const wordCards = [
+            "感情","季節","食べ物","乗り物",
+            "服","遊び","場所","人物",
+            "色","動物","道具","音楽"
+        ];
 
-       function drawTopic() {
-           const trigger = shuffle(triggerCards)[0];
-           gameState.currentTrigger = trigger;
-           
-           const modalContent = `
-               <h2>${trigger}</h2>
-               <p>〇〇の部分を決めてください</p>
-               <button class="btn" onclick="selectWordMethod('self')">自分で入力（得点2倍）</button>
-               <button class="btn btn-secondary" onclick="selectWordMethod('card')">ワードカードから選ぶ</button>
-           `;
-           showModal(modalContent);
-       }
+        const reactionCards = [
+            {text:"ユニーク！",point:3},
+            {text:"実用的！",point:2},
+            {text:"びっくり！",point:3},
+            {text:"感動的！",point:3},
+            {text:"わかりやすいね",point:2},
+            {text:"おもしろい！",point:3},
+            {text:"あたらしい！",point:3},
+            {text:"活気があるね",point:2},
+            {text:"挑戦的！",point:3},
+            {text:"やまとなでしこだね",point:2},
+            {text:"おしゃれだね",point:2},
+            {text:"温故知新だね",point:2},
+            {text:"低姿勢だね",point:1},
+            {text:"せやね",point:1},
+            {text:"しみるね",point:2},
+            {text:"うまれたね",point:2},
+            {text:"なるほど",point:1},
+            {text:"それそれ",point:1},
+            {text:"やられた！",point:3},
+            {text:"うひょー！",point:3}
+        ];
 
-       function selectWordMethod(method) {
-           const player = gameState.players[gameState.currentPlayer];
-           
-           if (method === 'self') {
-               const modalContent = `
-                   <h2>〇〇を入力してください</h2>
-                   <input type="text" id="customWord" style="width:100%; padding:10px; margin:10px 0;">
-                   <button class="btn" onclick="setTopic(document.getElementById('customWord').value, true)">決定</button>
-               `;
-               showModal(modalContent);
-           } else {
-               const word = shuffle(wordCards)[0];
-               setTopic(word, false);
-           }
-       }
+        let localState = {
+            uid: null,
+            playerName: '',
+            roomCode: '',
+            isHost: false,
+            currentRoom: null,
+            timerInterval: null
+        };
 
-       function setTopic(word, isDouble) {
-           if (!word) return;
-           
-           const player = gameState.players[gameState.currentPlayer];
-           gameState.doublePointFlags[player] = isDouble;
-           gameState.currentTopic = gameState.currentTrigger.replace('〇〇', word);
-           
-           document.getElementById('topicCard').innerHTML = `
-               <h2>${gameState.currentTopic}</h2>
-               <p>${isDouble ? '（自力入力：得点2倍）' : ''}</p>
-           `;
-           
-           hideModal();
-           startTimer();
-           createPlayerInputs();
-       }
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
 
-       function createPlayerInputs() {
-           const playerArea = document.getElementById('playerArea');
-           playerArea.innerHTML = '';
-           
-           gameState.players.forEach(player => {
-               const div = document.createElement('div');
-               div.className = 'player-card';
-               div.innerHTML = `
-                   <h3>${player}</h3>
-                   <input type="text" id="answer-${player}" placeholder="回答を入力">
-                   <button class="btn" onclick="submitAnswer('${player}')">送信</button>
-                   <div id="submitted-${player}"></div>
-               `;
-               playerArea.appendChild(div);
-           });
-       }
+        function generateUid() {
+            return Math.random().toString(36).substr(2, 9);
+        }
 
-       function submitAnswer(player) {
-           const input = document.getElementById(`answer-${player}`);
-           const answer = input.value;
-           if (!answer) return;
-           
-           gameState.answers[player] = answer;
-           document.getElementById(`submitted-${player}`).innerHTML = `<p>✓ 送信済み</p>`;
-           input.disabled = true;
-           
-           if (Object.keys(gameState.answers).length === gameState.players.length) {
-               clearInterval(gameState.timerInterval);
-               document.getElementById('presentationArea').classList.remove('hidden');
-           }
-       }
+        function generateRoomCode() {
+            return Math.random().toString(36).substr(2, 4).toUpperCase();
+        }
 
-       function startTimer() {
-           let timeLeft = gameState.timerMode;
-           const timerContainer = document.getElementById('timerContainer');
-           timerContainer.classList.remove('hidden');
-           
-           gameState.timerInterval = setInterval(() => {
-               const minutes = Math.floor(timeLeft / 60);
-               const seconds = timeLeft % 60;
-               document.getElementById('timerText').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-               
-               const offset = 314 - (314 * timeLeft / gameState.timerMode);
-               document.getElementById('timerCircle').style.strokeDashoffset = offset;
-               
-               timeLeft--;
-               if (timeLeft < 0) {
-                   clearInterval(gameState.timerInterval);
-                   document.getElementById('presentationArea').classList.remove('hidden');
-               }
-           }, 1000);
-       }
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
 
-       function startPresentation() {
-           const answeredPlayers = Object.keys(gameState.answers).filter(p => gameState.answers[p]);
-           gameState.presentationOrder = shuffle(answeredPlayers);
-           gameState.presentationIndex = 0;
-           showNextPresentation();
-       }
+        window.createRoom = async function() {
+            const name = document.getElementById('playerName').value.trim();
+            if (!name) {
+                showToast('名前を入力してください');
+                return;
+            }
 
-       function showNextPresentation() {
-           if (gameState.presentationIndex >= gameState.presentationOrder.length) {
-               finishRound();
-               return;
-           }
-           
-           const player = gameState.presentationOrder[gameState.presentationIndex];
-           const answer = gameState.answers[player];
-           
-           const modalContent = `
-               <h2>${player}の回答</h2>
-               <h3>${answer}</h3>
-               <p>30秒で説明してください</p>
-               <div id="reactionArea">
-                   <h4>他のプレイヤーはリアクションを選んでください</h4>
-                   ${gameState.players.filter(p => p !== player).map(p => `
-                       <div style="margin:10px 0;">
-                           <label>${p}:</label>
-                           <select id="reaction-${p}">
-                               <option value="">選択してください</option>
-                               ${reactionCards.map((r, i) => `<option value="${i}">${r.text} (${r.point}点)</option>`).join('')}
-                           </select>
-                       </div>
-                   `).join('')}
-               </div>
-               <button class="btn" onclick="submitReactions('${player}')">次へ</button>
-           `;
-           showModal(modalContent);
-       }
+            localState.uid = generateUid();
+            localState.playerName = name;
+            localState.roomCode = generateRoomCode();
+            localState.isHost = true;
 
-       function submitReactions(targetPlayer) {
-           gameState.players.filter(p => p !== targetPlayer).forEach(player => {
-               const select = document.getElementById(`reaction-${player}`);
-               if (select && select.value) {
-                   const reaction = reactionCards[parseInt(select.value)];
-                   let points = reaction.point;
-                   if (gameState.doublePointFlags[targetPlayer]) {
-                       points *= 2;
-                   }
-                   gameState.scores[targetPlayer] = (gameState.scores[targetPlayer] || 0) + points;
-               }
-           });
-           
-           updateScoreBoard();
-           gameState.presentationIndex++;
-           showNextPresentation();
-       }
+            const roomRef = ref(db, `rooms/${localState.roomCode}`);
+            await set(roomRef, {
+                host: localState.uid,
+                createdAt: serverTimestamp(),
+                gameState: {
+                    phase: 'waiting',
+                    currentTopic: '',
+                    timerMode: 120,
+                    timer: 0
+                }
+            });
 
-       function finishRound() {
-           hideModal();
-           gameState.currentPlayer = (gameState.currentPlayer + 1) % gameState.players.length;
-           gameState.answers = {};
-           gameState.doublePointFlags = {};
-           
-           document.getElementById('topicCard').innerHTML = '<button class="btn" onclick="drawTopic()">お題を引く</button>';
-           document.getElementById('playerArea').innerHTML = '';
-           document.getElementById('timerContainer').classList.add('hidden');
-           document.getElementById('presentationArea').classList.add('hidden');
-       }
+            await joinRoomAsPlayer();
+            document.getElementById('roomCode').value = localState.roomCode;
+            showToast(`ルーム ${localState.roomCode} を作成しました`);
+        };
 
-       function updateScoreBoard() {
-           const scoreBoard = document.getElementById('scoreBoard');
-           scoreBoard.innerHTML = Object.entries(gameState.scores)
-               .sort((a, b) => b[1] - a[1])
-               .map(([player, score]) => `
-                   <div class="score-item">
-                       <span>${player}</span>
-                       <span>${score}点</span>
-                   </div>
-               `).join('');
-       }
+        window.joinRoom = async function() {
+            const name = document.getElementById('playerName').value.trim();
+            const code = document.getElementById('roomCode').value.trim().toUpperCase();
+            
+            if (!name || !code) {
+                showToast('名前とルームコードを入力してください');
+                return;
+            }
 
-       function showModal(content) {
-           document.getElementById('modalContent').innerHTML = content;
-           document.getElementById('modal').style.display = 'block';
-       }
+            localState.uid = generateUid();
+            localState.playerName = name;
+            localState.roomCode = code;
+            localState.isHost = false;
 
-       function hideModal() {
-           document.getElementById('modal').style.display = 'none';
-       }
+            await joinRoomAsPlayer();
+        };
 
-       function toggleBGM() {
-           const bgm = document.getElementById('bgm');
-           if (bgm.paused) {
-               bgm.play();
-           } else {
-               bgm.pause();
-           }
-       }
+        async function joinRoomAsPlayer() {
+            const playerRef = ref(db, `rooms/${localState.roomCode}/players/${localState.uid}`);
+            await set(playerRef, {
+                name: localState.playerName,
+                score: 0,
+                joinedAt: serverTimestamp()
+            });
 
-       /* TODO: 拡張案
-        * - WebSocket実装: Socket.IOでリアルタイム同期
-        * - DB保存: IndexedDBでゲーム履歴保存
-        * - オンライン対戦: Firebaseでルーム機能追加
-        * - カスタムカード: ユーザー作成カードの追加機能
-        * - 統計機能: 人気回答の分析・表示
-        */
-   </script>
+            onDisconnect(playerRef).remove();
+
+            localState.currentRoom = ref(db, `rooms/${localState.roomCode}`);
+            setupRealtimeListeners();
+
+            document.getElementById('roomSection').classList.add('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            document.getElementById('handArea').style.display = 'block';
+            
+            if (localState.isHost) {
+                document.getElementById('drawTopicBtn').classList.remove('hidden');
+                document.getElementById('startPresentBtn').classList.remove('hidden');
+            }
+        }
+
+        function setupRealtimeListeners() {
+            onValue(localState.currentRoom, (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                updateRoomInfo(data);
+                updateScoreBoard(data.players || {});
+                updateGameState(data.gameState || {});
+                
+                if (data.players && !data.players[localState.uid]) {
+                    showToast('接続が切断されました');
+                    location.reload();
+                }
+            });
+        }
+
+        function updateRoomInfo(data) {
+            const players = Object.values(data.players || {});
+            document.getElementById('roomInfo').innerHTML = `
+                <p>ルームコード: <strong>${localState.roomCode}</strong></p>
+                <p>参加者: ${players.length}人</p>
+                <p>ホスト: ${localState.isHost ? 'あなた' : '他のプレイヤー'}</p>
+            `;
+        }
+
+        function updateScoreBoard(players) {
+            const scores = Object.entries(players)
+                .map(([uid, player]) => ({ name: player.name, score: player.score || 0 }))
+                .sort((a, b) => b.score - a.score);
+
+            document.getElementById('scoreBoard').innerHTML = scores.map(player => `
+                <div class="score-item">
+                    <span>${player.name}</span>
+                    <span>${player.score}点</span>
+                </div>
+            `).join('');
+        }
+
+        function updateGameState(gameState) {
+            const { phase, currentTopic, timer, answers, presentationData } = gameState;
+
+            if (phase === 'topic' && currentTopic) {
+                document.getElementById('topicText').textContent = currentTopic;
+                document.getElementById('drawTopicBtn').classList.add('hidden');
+            }
+
+            if (phase === 'answering') {
+                showAnswerInput();
+                updateAnswerStatus(answers || {});
+            }
+
+            if (timer > 0) {
+                updateTimer(timer);
+            }
+
+            if (phase === 'presentation' && presentationData) {
+                showPresentation(presentationData);
+            }
+
+            if (phase === 'reaction' && presentationData) {
+                showReactionSelection(presentationData);
+            }
+        }
+
+        function updateTimer(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById('timerText').textContent = `${minutes}:${secs.toString().padStart(2, '0')}`;
+            document.getElementById('timerContainer').classList.remove('hidden');
+        }
+
+        window.drawTopic = async function() {
+            const trigger = shuffle(triggerCards)[0];
+            
+            const modalContent = `
+                <h2>${trigger}</h2>
+                <p>〇〇の部分を決めてください</p>
+                <button class="btn" onclick="selectWordMethod('self', '${trigger}')">自分で入力（得点2倍）</button>
+                <button class="btn btn-secondary" onclick="selectWordMethod('card', '${trigger}')">ワードカードから選ぶ</button>
+            `;
+            showModal(modalContent);
+        };
+
+        window.selectWordMethod = async function(method, trigger) {
+            if (method === 'self') {
+                const modalContent = `
+                    <h2>〇〇を入力してください</h2>
+                    <input type="text" id="customWord" class="input-field">
+                    <button class="btn" onclick="setTopic('${trigger}', document.getElementById('customWord').value, true)">決定</button>
+                `;
+                showModal(modalContent);
+            } else {
+                const word = shuffle(wordCards)[0];
+                setTopic(trigger, word, false);
+            }
+        };
+
+        window.setTopic = async function(trigger, word, isDouble) {
+            if (!word) return;
+
+            const topic = trigger.replace('〇〇', word);
+            
+            await set(ref(db, `rooms/${localState.roomCode}/gameState`), {
+                phase: 'answering',
+                currentTopic: topic,
+                timerMode: 120,
+                timer: 120,
+                doublePoint: isDouble ? localState.uid : null
+            });
+
+            hideModal();
+            if (localState.isHost) startTimer();
+        };
+
+        function startTimer() {
+            let timeLeft = 120;
+            localState.timerInterval = setInterval(async () => {
+                timeLeft--;
+                await set(ref(db, `rooms/${localState.roomCode}/gameState/timer`), timeLeft);
+                
+                if (timeLeft <= 0) {
+                    clearInterval(localState.timerInterval);
+                    if (localState.isHost) {
+                        document.getElementById('presentationArea').classList.remove('hidden');
+                    }
+                }
+            }, 1000);
+        }
+
+        function showAnswerInput() {
+            document.getElementById('handContent').innerHTML = `
+                <h3>あなたの回答</h3>
+                <input type="text" id="myAnswer" class="input-field" placeholder="回答を入力">
+                <button class="btn" onclick="submitAnswer()">送信</button>
+            `;
+        }
+
+        window.submitAnswer = async function() {
+            const answer = document.getElementById('myAnswer').value.trim();
+            if (!answer) return;
+
+            await set(ref(db, `rooms/${localState.roomCode}/gameState/answers/${localState.uid}`), {
+                text: answer,
+                playerName: localState.playerName
+            });
+
+            document.getElementById('myAnswer').disabled = true;
+            showToast('回答を送信しました');
+        };
+
+        function updateAnswerStatus(answers) {
+            const players = Object.keys(answers).length;
+            document.getElementById('answerStatus').innerHTML = `
+                <p>回答済み: ${players}人</p>
+            `;
+        }
+
+        window.startPresentation = async function() {
+            const snapshot = await new Promise(resolve => {
+                onValue(ref(db, `rooms/${localState.roomCode}/gameState/answers`), resolve, { onlyOnce: true });
+            });
+            
+            const answers = snapshot.val() || {};
+            const order = shuffle(Object.keys(answers));
+            
+            await set(ref(db, `rooms/${localState.roomCode}/gameState`), {
+                phase: 'presentation',
+                presentationData: {
+                    order: order,
+                    currentIndex: 0,
+                    answers: answers
+                }
+            });
+        };
+
+        function showPresentation(data) {
+            const { order, currentIndex, answers } = data;
+            if (currentIndex >= order.length) {
+                finishRound();
+                return;
+            }
+
+            const currentUid = order[currentIndex];
+            const answer = answers[currentUid];
+            
+            document.getElementById('presentationContent').innerHTML = `
+                <div class="answer-display">
+                    <h3>${answer.playerName}の回答</h3>
+                    <p style="font-size: 24px; margin: 20px 0;">${answer.text}</p>
+                    <p>30秒で説明してください</p>
+                </div>
+            `;
+
+            if (localState.isHost) {
+                setTimeout(async () => {
+                    await set(ref(db, `rooms/${localState.roomCode}/gameState/phase`), 'reaction');
+                }, 30000);
+            }
+        }
+
+        function showReactionSelection(data) {
+            const { order, currentIndex, answers } = data;
+            const currentUid = order[currentIndex];
+            
+            if (currentUid === localState.uid) {
+                document.getElementById('handContent').innerHTML = '<p>他のプレイヤーがリアクションを選んでいます...</p>';
+                return;
+            }
+
+            document.getElementById('handContent').innerHTML = `
+                <h3>リアクションを選んでください</h3>
+                <div class="reaction-cards">
+                    ${reactionCards.map((card, i) => `
+                        <div class="reaction-card" onclick="sendReaction(${i}, '${currentUid}')">
+                            <div>${card.text}</div>
+                            <div>${card.point}点</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        window.sendReaction = async function(index, targetUid) {
+            const reaction = reactionCards[index];
+            const snapshot = await new Promise(resolve => {
+                onValue(ref(db, `rooms/${localState.roomCode}`), resolve, { onlyOnce: true });
+            });
+            
+            const roomData = snapshot.val();
+            const isDouble = roomData.gameState.doublePoint === targetUid;
+            const points = reaction.point * (isDouble ? 2 : 1);
+            
+            const currentScore = roomData.players[targetUid].score || 0;
+            await set(ref(db, `rooms/${localState.roomCode}/players/${targetUid}/score`), currentScore + points);
+            
+            document.getElementById('handContent').innerHTML = '<p>リアクションを送信しました</p>';
+            
+            if (localState.isHost) {
+                setTimeout(async () => {
+                    const nextIndex = roomData.gameState.presentationData.currentIndex + 1;
+                    if (nextIndex >= roomData.gameState.presentationData.order.length) {
+                        await finishRound();
+                    } else {
+                        await set(ref(db, `rooms/${localState.roomCode}/gameState/presentationData/currentIndex`), nextIndex);
+                        await set(ref(db, `rooms/${localState.roomCode}/gameState/phase`), 'presentation');
+                    }
+                }, 2000);
+            }
+        };
+
+        async function finishRound() {
+            await set(ref(db, `rooms/${localState.roomCode}/gameState`), {
+                phase: 'waiting',
+                currentTopic: '',
+                timer: 0
+            });
+            
+            document.getElementById('topicText').textContent = 'ホストがお題を引くのを待っています...';
+            document.getElementById('timerContainer').classList.add('hidden');
+            document.getElementById('presentationContent').innerHTML = '';
+            document.getElementById('handContent').innerHTML = '';
+            
+            if (localState.isHost) {
+                document.getElementById('drawTopicBtn').classList.remove('hidden');
+            }
+        }
+
+        function showModal(content) {
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function hideModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                hideModal();
+            }
+        };
+
+        /* TODO: セキュリティルール / オフラインキャッシュ / 大人数対応 */
+    </script>
 </body>
 </html>
